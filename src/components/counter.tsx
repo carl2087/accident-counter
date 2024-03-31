@@ -1,23 +1,58 @@
-import { useEffect, useState } from 'react';
+// The reducer below would usually be in it's own file is within this file for demo purposes
+
+type InitialState = {
+  count: number;
+  draftCount: string | number;
+};
+
+const initialState: InitialState = {
+  count: 0,
+  draftCount: 0,
+};
+
+const reducer = (state = initialState, action: any) => {
+  const { count, draftCount } = state;
+
+  if (action.type === 'increment') {
+    const newCount = count + 1;
+    return { count: newCount, draftCount: newCount };
+  }
+
+  if (action.type === 'decrement') {
+    const newCount = count - 1;
+    return { count: newCount, draftCount: newCount };
+  }
+
+  if (action.type === 'reset') {
+    return { count: 0, draftCount: 0 };
+  }
+
+  if (action.type === 'updateDraftCount') {
+    console.log('updateDraftCount');
+
+    return { count, draftCount: action.payload };
+  }
+
+  if (action.type === 'updateCountFromDraft') {
+    return { count: Number(draftCount), draftCount };
+  }
+
+  return state;
+};
 
 const Counter = () => {
-  const [count, setCount] = useState(0);
-  const [draftCount, setDraftCount] = useState(count);
-
-  useEffect(() => {
-    setDraftCount(count);
-  }, [count]);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <section className="flex w-2/3 flex-col items-center gap-8 border-4 border-primary-500 bg-white p-8 shadow-lg">
       <h1>Days Since the Last Accident</h1>
-      <p className="text-6xl">{count}</p>
+      <p className="text-6xl">{state.count}</p>
       <div className="flex gap-2">
-        <button onClick={() => setCount((count) => count - 1)}>
+        <button onClick={() => dispatch({ type: 'decrement' })}>
           ➖ Decrement
         </button>
-        <button onClick={() => setCount(0)}>🔁 Reset</button>
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => dispatch({ type: 'reset' })}>🔁 Reset</button>
+        <button onClick={() => dispatch({ type: 'increment' })}>
           ➕ Increment
         </button>
       </div>
@@ -25,7 +60,7 @@ const Counter = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            setCount(draftCount);
+            dispatch({ action: 'updateDraftCount' });
           }}
         >
           <input
