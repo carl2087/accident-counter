@@ -1,3 +1,5 @@
+import { useReducer } from 'react';
+
 // The reducer below would usually be in it's own file is within this file for demo purposes
 
 type InitialState = {
@@ -5,12 +7,21 @@ type InitialState = {
   draftCount: string | number;
 };
 
+type Action = {
+  type: 'increment' | 'decrement' | 'reset' | 'updateCountFromDraft';
+};
+
+type ActionWithPayload = {
+  type: 'updateDraftCount';
+  payload: number | string;
+};
+
 const initialState: InitialState = {
   count: 0,
   draftCount: 0,
 };
 
-const reducer = (state = initialState, action: any) => {
+const reducer = (state = initialState, action: Action | ActionWithPayload) => {
   const { count, draftCount } = state;
 
   if (action.type === 'increment') {
@@ -60,13 +71,15 @@ const Counter = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            dispatch({ action: 'updateDraftCount' });
+            dispatch({ type: 'updateCountFromDraft' });
           }}
         >
           <input
             type="number"
-            value={draftCount}
-            onChange={(e) => setDraftCount(e.target.valueAsNumber)}
+            value={state.draftCount}
+            onChange={(e) =>
+              dispatch({ type: 'updateDraftCount', payload: e.target.value })
+            }
           />
           <button type="submit">Update Counter</button>
         </form>
